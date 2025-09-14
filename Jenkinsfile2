@@ -1,17 +1,15 @@
-(with K8S Stage)
-
 pipeline {
     agent any
 
     tools {
         jdk 'jdk17'
-        nodejs 'node23'
+        nodejs 'node18'
     }
 
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
-        DOCKER_IMAGE = 'akshu20791/bms:latest'
-        EKS_CLUSTER_NAME = 'akshat-eks'
+        DOCKER_IMAGE = 'shreyagurrala/bms:latest'
+        EKS_CLUSTER_NAME = 'shreya-eks-clus'
         AWS_REGION = 'us-east-1'
     }
 
@@ -24,7 +22,7 @@ pipeline {
 
         stage('Checkout from Git') {
             steps {
-                git branch: 'main', url: 'https://github.com/akshu20791/Book-My-Show.git'
+                git branch: 'main', url: 'https://github.com/Gurrala-Shreya/Book-My-Show.git'
                 sh 'ls -la'  // Verify files after checkout
             }
         }
@@ -62,19 +60,6 @@ pipeline {
                     exit 1
                 fi
                 '''
-            }
-        }
-
-        stage('OWASP FS Scan') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
-
-        stage('Trivy FS Scan') {
-            steps {
-                sh 'trivy fs . > trivyfs.txt'
             }
         }
 
@@ -128,7 +113,7 @@ pipeline {
                       "Build Number: ${env.BUILD_NUMBER}<br/>" +
                       "URL: ${env.BUILD_URL}<br/>",
                 to: 'kastrokiran@gmail.com',
-                attachmentsPattern: 'trivyfs.txt'
+                attachmentsPattern: ''
         }
     }
 }
